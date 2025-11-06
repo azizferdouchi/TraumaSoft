@@ -8,18 +8,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
-        return "index"; // Maintenant redirige vers la page d'accueil
+    public String home(Model model) {
+        model.addAttribute("message", "Bienvenue dans TraumaSoft");
+        return "home";
     }
-
-    @GetMapping("/login")
-    public String login(Model model) {
-        return "login";
+    
+    @GetMapping("/patients")
+    public String patientsRedirect() {
+        return "redirect:/patients/list";
     }
-
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        model.addAttribute("pageTitle", "Tableau de Bord");
-        return "dashboard";
+    
+    @GetMapping("/rendezvous")
+    public String rendezvousRedirect() {
+        return "redirect:/rendezvous/list";
     }
 }

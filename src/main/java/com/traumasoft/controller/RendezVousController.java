@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Controller
@@ -21,47 +21,44 @@ public class RendezVousController {
     @Autowired
     private PatientService patientService;
 
-    @GetMapping
+    @GetMapping("/list")
     public String listRendezVous(Model model) {
         List<RendezVous> rendezVous = rendezVousService.getAllRendezVous();
         model.addAttribute("rendezVous", rendezVous);
-        model.addAttribute("pageTitle", "Gestion des Rendez-vous");
-        return "rendezvous";
+        return "listRendezVous";
     }
 
-    @GetMapping("/nouveau")
-    public String showRendezVousForm(Model model) {
+    @GetMapping("/add")
+    public String showAddRendezVousForm(Model model) {
         List<Patient> patients = patientService.getAllPatients();
         model.addAttribute("rendezVous", new RendezVous());
         model.addAttribute("patients", patients);
-        model.addAttribute("pageTitle", "Nouveau Rendez-vous");
-        return "rendezvous-form";
+        return "addRendezVous";
     }
 
-    @PostMapping("/enregistrer")
-    public String saveRendezVous(@ModelAttribute RendezVous rendezVous, 
-                                @RequestParam Long patientId) {
+    @PostMapping("/add")
+    public String addRendezVous(@ModelAttribute RendezVous rendezVous, 
+                               @RequestParam("patientId") Long patientId) {
         Patient patient = patientService.getPatientById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient non trouvé: " + patientId));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid patient Id:" + patientId));
         rendezVous.setPatient(patient);
         rendezVousService.saveRendezVous(rendezVous);
-        return "redirect:/rendezvous";
+        return "redirect:/rendezvous/list";
     }
 
-    @GetMapping("/modifier/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    @GetMapping("/edit/{id}")
+    public String showEditRendezVousForm(@PathVariable("id") Long id, Model model) {
         RendezVous rendezVous = rendezVousService.getRendezVousById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Rendez-vous non trouvé: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid rendez-vous Id:" + id));
         List<Patient> patients = patientService.getAllPatients();
         model.addAttribute("rendezVous", rendezVous);
         model.addAttribute("patients", patients);
-        model.addAttribute("pageTitle", "Modifier Rendez-vous");
-        return "rendezvous-form";
+        return "addRendezVous";
     }
 
-    @GetMapping("/supprimer/{id}")
-    public String deleteRendezVous(@PathVariable Long id) {
+    @GetMapping("/delete/{id}")
+    public String deleteRendezVous(@PathVariable("id") Long id) {
         rendezVousService.deleteRendezVous(id);
-        return "redirect:/rendezvous";
+        return "redirect:/rendezvous/list";
     }
 }

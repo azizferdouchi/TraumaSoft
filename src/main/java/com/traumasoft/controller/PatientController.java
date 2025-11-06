@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @Controller
@@ -15,47 +16,36 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-    @GetMapping
+    @GetMapping("/list")
     public String listPatients(Model model) {
         List<Patient> patients = patientService.getAllPatients();
         model.addAttribute("patients", patients);
-        model.addAttribute("pageTitle", "Gestion des Patients");
-        return "patients";
+        return "listPatients";
     }
 
-    @GetMapping("/nouveau")
-    public String showPatientForm(Model model) {
+    @GetMapping("/add")
+    public String showAddPatientForm(Model model) {
         model.addAttribute("patient", new Patient());
-        model.addAttribute("pageTitle", "Nouveau Patient");
-        return "patient-form";
+        return "addPatient";
     }
 
-    @PostMapping("/enregistrer")
-    public String savePatient(@ModelAttribute Patient patient) {
+    @PostMapping("/add")
+    public String addPatient(@ModelAttribute Patient patient) {
         patientService.savePatient(patient);
-        return "redirect:/patients";
+        return "redirect:/patients/list";
     }
 
-    @GetMapping("/modifier/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    @GetMapping("/edit/{id}")
+    public String showEditPatientForm(@PathVariable("id") Long id, Model model) {
         Patient patient = patientService.getPatientById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient non trouvé: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid patient Id:" + id));
         model.addAttribute("patient", patient);
-        model.addAttribute("pageTitle", "Modifier Patient");
-        return "patient-form";
+        return "addPatient";
     }
 
-    @GetMapping("/supprimer/{id}")
-    public String deletePatient(@PathVariable Long id) {
+    @GetMapping("/delete/{id}")
+    public String deletePatient(@PathVariable("id") Long id) {
         patientService.deletePatient(id);
-        return "redirect:/patients";
-    }
-
-    @GetMapping("/rechercher")
-    public String searchPatients(@RequestParam String keyword, Model model) {
-        List<Patient> patients = patientService.searchPatients(keyword);
-        model.addAttribute("patients", patients);
-        model.addAttribute("pageTitle", "Résultats de recherche: " + keyword);
-        return "patients";
+        return "redirect:/patients/list";
     }
 }
