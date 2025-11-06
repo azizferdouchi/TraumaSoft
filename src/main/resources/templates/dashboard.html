@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Tableau de Bord</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">TraumaSoft</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/dashboard}">Tableau de Bord</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/patients}">Patients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/rendezvous}">Rendez-vous</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="btn btn-outline-light btn-sm">Déconnexion</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 th:text="${pageTitle}">Tableau de Bord</h1>
+        
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Patients</h5>
+                                <p class="card-text">Gestion des dossiers patients</p>
+                            </div>
+                            <div class="display-4">📋</div>
+                        </div>
+                        <a th:href="@{/patients}" class="btn btn-light btn-sm mt-2">Voir les patients</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Rendez-vous</h5>
+                                <p class="card-text">Planning des consultations</p>
+                            </div>
+                            <div class="display-4">📅</div>
+                        </div>
+                        <a th:href="@{/rendezvous}" class="btn btn-light btn-sm mt-2">Voir les RDV</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Rapports</h5>
+                                <p class="card-text">Statistiques et rapports</p>
+                            </div>
+                            <div class="display-4">📊</div>
+                        </div>
+                        <a href="#" class="btn btn-light btn-sm mt-2">Voir les rapports</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Derniers Patients</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Aucun patient enregistré pour le moment.</p>
+                        <a th:href="@{/patients/nouveau}" class="btn btn-primary btn-sm">Ajouter un patient</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Prochains Rendez-vous</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Aucun rendez-vous planifié.</p>
+                        <a th:href="@{/rendezvous/nouveau}" class="btn btn-success btn-sm">Planifier un RDV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
