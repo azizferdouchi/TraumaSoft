@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraumaSoft - Cabinet de Traumatologie</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <h1><i class="fas fa-bone"></i> TraumaSoft</h1>
+            </div>
+            <div class="user-info">
+                <span>Dr. Traumatologue</span>
+                <i class="fas fa-user-md"></i>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <ul>
+                <li class="active"><a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Tableau de Bord</a></li>
+                <li><a href="#patients"><i class="fas fa-user-injured"></i> Patients</a></li>
+                <li><a href="#appointments"><i class="fas fa-calendar-check"></i> Rendez-vous</a></li>
+                <li><a href="#waiting-room"><i class="fas fa-clock"></i> Salle d'Attente</a></li>
+                <li><a href="#operations"><i class="fas fa-procedures"></i> Opérations</a></li>
+                <li><a href="#certificates"><i class="fas fa-file-medical"></i> Certificats</a></li>
+                <li><a href="#finance"><i class="fas fa-money-bill-wave"></i> Finance</a></li>
+                <li><a href="#reports"><i class="fas fa-chart-bar"></i> Rapports</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-header">
+                    <h2>Tableau de Bord</h2>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <i class="fas fa-user-injured"></i>
+                            <div class="stat-info">
+                                <h3 id="total-patients">0</h3>
+                                <span>Patients Total</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <div class="stat-info">
+                                <h3 id="today-appointments">0</h3>
+                                <span>RDV Aujourd'hui</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <h3 id="waiting-patients">0</h3>
+                                <span>En Attente</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div class="stat-info">
+                                <h3 id="month-revenue">0 DH</h3>
+                                <span>Revenu Mensuel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Rendez-vous du Jour</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="today-appointments-list">
+                                        <div class="loading">Chargement...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Patients en Attente</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="waiting-room-list">
+                                        <div class="loading">Chargement...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Activité Récente</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="recent-activity">
+                                        <div class="loading">Chargement des activités...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patients Section -->
+            <section id="patients" class="content-section">
+                <div class="section-header">
+                    <h2>Gestion des Patients</h2>
+                    <button class="btn btn-primary" onclick="app.showPatientForm()">
+                        <i class="fas fa-plus"></i> Nouveau Patient
+                    </button>
+                </div>
+                
+                <div class="patients-content">
+                    <div class="search-bar">
+                        <input type="text" id="patient-search" placeholder="Rechercher un patient...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="patients-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom Complet</th>
+                                    <th>Date Naissance</th>
+                                    <th>Téléphone</th>
+                                    <th>Assurance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-tbody">
+                                <tr>
+                                    <td colspan="6" class="loading">Chargement des patients...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments Section -->
+            <section id="appointments" class="content-section">
+                <div class="section-header">
+                    <h2>Gestion des Rendez-vous</h2>
+                    <button class="btn btn-primary" onclick="appointmentsManager.showAppointmentForm()">
+                        <i class="fas fa-plus"></i> Nouveau RDV
+                    </button>
+                </div>
+
+                <div class="appointments-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="total-appointments">0</span>
+                        <span class="stat-label">Total RDV</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="today-appointments-count">0</span>
+                        <span class="stat-label">RDV Aujourd'hui</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="planned-appointments">0</span>
+                        <span class="stat-label">Planifiés</span>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="appointment-filter-date">Date:</label>
+                        <input type="date" id="appointment-filter-date">
+                    </div>
+                    <div class="filter-group">
+                        <label for="appointment-filter-status">Statut:</label>
+                        <select id="appointment-filter-status">
+                            <option value="">Tous</option>
+                            <option value="planifié">Planifié</option>
+                            <option value="confirmé">Confirmé</option>
+                            <option value="annulé">Annulé</option>
+                            <option value="terminé">Terminé</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="appointments-list" id="appointments-list">
+                    <div class="loading">Chargement des rendez-vous...</div>
+                </div>
+            </section>
+
+            <!-- Waiting Room Section -->
+            <section id="waiting-room" class="content-section">
+                <div class="section-header">
+                    <h2>Salle d'Attente</h2>
+                    <button class="btn btn-primary" onclick="waitingRoomManager.showAddPatientForm()">
+                        <i class="fas fa-plus"></i> Ajouter Patient
+                    </button>
+                </div>
+
+                <div class="waiting-room-content">
+                    <div class="waiting-stats">
+                        <div class="waiting-stat">
+                            <i class="fas fa-users"></i>
+                            <span id="waiting-count">0</span>
+                            <span>Patients en attente</span>
+                        </div>
+                        <div class="waiting-stat">
+                            <i class="fas fa-clock"></i>
+                            <span id="average-wait-time">0 min</span>
+                            <span>Temps d'attente moyen</span>
+                        </div>
+                    </div>
+
+                    <div class="waiting-list" id="waiting-list">
+                        <div class="loading">Chargement de la salle d'attente...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Operations Section -->
+            <section id="operations" class="content-section">
+                <div class="section-header">
+                    <h2>Gestion des Opérations</h2>
+                    <button class="btn btn-primary" onclick="operationsManager.showOperationForm()">
+                        <i class="fas fa-plus"></i> Nouvelle Opération
+                    </button>
+                </div>
+
+                <div class="operations-content">
+                    <div class="operations-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="total-operations">0</span>
+                            <span class="stat-label">Opérations Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="month-operations">0</span>
+                            <span class="stat-label">Ce Mois</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="cabinet-operations">0</span>
+                            <span class="stat-label">Au Cabinet</span>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="operations-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Patient</th>
+                                    <th>Type d'Opération</th>
+                                    <th>Lieu</th>
+                                    <th>Durée</th>
+                                    <th>Médecin</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="operations-tbody">
+                                <tr>
+                                    <td colspan="7" class="loading">Chargement des opérations...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Certificates Section -->
+            <section id="certificates" class="content-section">
+                <div class="section-header">
+                    <h2>Gestion des Certificats</h2>
+                    <button class="btn btn-primary" onclick="certificatesManager.showCertificateForm()">
+                        <i class="fas fa-plus"></i> Nouveau Certificat
+                    </button>
+                </div>
+
+                <div class="certificates-content">
+                    <div class="certificates-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="total-certificates">0</span>
+                            <span class="stat-label">Certificats Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="month-certificates">0</span>
+                            <span class="stat-label">Ce Mois</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="sick-leave-certificates">0</span>
+                            <span class="stat-label">Arrêts Maladie</span>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="certificates-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Patient</th>
+                                    <th>Type</th>
+                                    <th>Durée</th>
+                                    <th>Diagnostic</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="certificates-tbody">
+                                <tr>
+                                    <td colspan="6" class="loading">Chargement des certificats...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Finance Section -->
+            <section id="finance" class="content-section">
+                <div class="section-header">
+                    <h2>Gestion Financière</h2>
+                    <button class="btn btn-primary" onclick="financeManager.showPaymentForm()">
+                        <i class="fas fa-plus"></i> Nouveau Paiement
+                    </button>
+                </div>
+
+                <div class="finance-content">
+                    <div class="finance-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div class="stat-info">
+                                <h3 id="total-revenue">0 DH</h3>
+                                <span>Revenu Total</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div class="stat-info">
+                                <h3 id="month-revenue-finance">0 DH</h3>
+                                <span>Ce Mois</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <h3 id="pending-payments">0 DH</h3>
+                                <span>En Attente</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="payments-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Patient</th>
+                                    <th>Montant</th>
+                                    <th>Mode</th>
+                                    <th>Statut</th>
+                                    <th>Facture</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-tbody">
+                                <tr>
+                                    <td colspan="7" class="loading">Chargement des paiements...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="section-header">
+                    <h2>Rapports et Statistiques</h2>
+                    <button class="btn btn-primary" onclick="reportsManager.generateReport()">
+                        <i class="fas fa-download"></i> Générer Rapport
+                    </button>
+                </div>
+
+                <div class="reports-content">
+                    <div class="reports-filters">
+                        <div class="filter-group">
+                            <label for="report-type">Type de Rapport:</label>
+                            <select id="report-type">
+                                <option value="monthly">Mensuel</option>
+                                <option value="quarterly">Trimestriel</option>
+                                <option value="yearly">Annuel</option>
+                                <option value="custom">Personnalisé</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="report-start-date">Date Début:</label>
+                            <input type="date" id="report-start-date">
+                        </div>
+                        <div class="filter-group">
+                            <label for="report-end-date">Date Fin:</label>
+                            <input type="date" id="report-end-date">
+                        </div>
+                        <button class="btn btn-secondary" onclick="reportsManager.loadReport()">
+                            <i class="fas fa-refresh"></i> Actualiser
+                        </button>
+                    </div>
+
+                    <div class="reports-stats">
+                        <div class="stat-card large">
+                            <h3>Activité Médicale</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-patients">0</span>
+                                    <span class="stat-label">Patients</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-consultations">0</span>
+                                    <span class="stat-label">Consultations</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-operations">0</span>
+                                    <span class="stat-label">Opérations</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-certificates">0</span>
+                                    <span class="stat-label">Certificats</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card large">
+                            <h3>Finances</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-revenue">0 DH</span>
+                                    <span class="stat-label">Revenu Total</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-pending">0 DH</span>
+                                    <span class="stat-label">En Attente</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number" id="report-average">0 DH</span>
+                                    <span class="stat-label">Moyenne/RDV</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-container">
+                        <div class="chart-card">
+                            <h4>Répartition des Types de Consultation</h4>
+                            <div id="consultation-chart" class="chart-placeholder">
+                                <div class="loading">Chargement du graphique...</div>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h4>Évolution du Revenu Mensuel</h4>
+                            <div id="revenue-chart" class="chart-placeholder">
+                                <div class="loading">Chargement du graphique...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Patient Modal -->
+    <div id="patient-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="patient-modal-title">Nouveau Patient</h3>
+                <span class="close" onclick="app.closePatientModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="patient-form">
+                    <input type="hidden" id="patient-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nom">Nom *</label>
+                            <input type="text" id="nom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prenom">Prénom *</label>
+                            <input type="text" id="prenom" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date_naissance">Date de Naissance *</label>
+                            <input type="date" id="date_naissance" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sexe">Sexe *</label>
+                            <select id="sexe" required>
+                                <option value="">Sélectionner</option>
+                                <option value="M">Masculin</option>
+                                <option value="F">Féminin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="adresse">Adresse</label>
+                        <textarea id="adresse" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="telephone">Téléphone *</label>
+                            <input type="tel" id="telephone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="assurance_compagnie">Compagnie d'Assurance</label>
+                            <input type="text" id="assurance_compagnie">
+                        </div>
+                        <div class="form-group">
+                            <label for="assurance_numero">Numéro d'Assurance</label>
+                            <input type="text" id="assurance_numero">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="assurance_type">Type d'Assurance</label>
+                        <select id="assurance_type">
+                            <option value="">Sélectionner</option>
+                            <option value="CNAM">CNAM</option>
+                            <option value="Assurance Privée">Assurance Privée</option>
+                            <option value="Mutuelle">Mutuelle</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="app.closePatientModal()">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="app.savePatient()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div id="appointment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="appointment-modal-title">Nouveau Rendez-vous</h3>
+                <span class="close" onclick="appointmentsManager.closeAppointmentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="appointment-form">
+                    <div class="form-group">
+                        <label for="appointment-patient">Patient *</label>
+                        <select id="appointment-patient" required>
+                            <option value="">Sélectionner un patient</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointment-date">Date *</label>
+                            <input type="date" id="appointment-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-time">Heure *</label>
+                            <input type="time" id="appointment-time" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-type">Type de Consultation *</label>
+                        <input type="text" id="appointment-type" required placeholder="Ex: Consultation de suivi">
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-status">Statut</label>
+                        <select id="appointment-status">
+                            <option value="planifié">Planifié</option>
+                            <option value="confirmé">Confirmé</option>
+                            <option value="annulé">Annulé</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointment-notes">Notes</label>
+                        <textarea id="appointment-notes" rows="3" placeholder="Notes supplémentaires..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="appointmentsManager.closeAppointmentModal()">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="appointmentsManager.saveAppointment()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Detail Modal -->
+    <div id="patient-detail-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="patient-detail-title">Détails du Patient</h3>
+                <span class="close" onclick="app.closePatientDetailModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="patient-tabs">
+                    <button class="tab-button active" onclick="app.openPatientTab(event, 'info')">Informations</button>
+                    <button class="tab-button" onclick="app.openPatientTab(event, 'diagnosis')">Diagnostics</button>
+                    <button class="tab-button" onclick="app.openPatientTab(event, 'prescriptions')">Ordonnances</button>
+                    <button class="tab-button" onclick="app.openPatientTab(event, 'dicom')">Scanners DICOM</button>
+                    <button class="tab-button" onclick="app.openPatientTab(event, 'certificates')">Certificats</button>
+                </div>
+                
+                <div id="patient-info-tab" class="tab-content active">
+                    <div class="loading">Chargement des informations...</div>
+                </div>
+                
+                <div id="patient-diagnosis-tab" class="tab-content">
+                    <div class="tab-header">
+                        <h4>Diagnostics</h4>
+                        <button class="btn btn-primary" onclick="patientsManager.showDiagnosisForm()">
+                            <i class="fas fa-plus"></i> Nouveau Diagnostic
+                        </button>
+                    </div>
+                    <div id="diagnosis-list" class="loading">Chargement des diagnostics...</div>
+                </div>
+                
+                <div id="patient-prescriptions-tab" class="tab-content">
+                    <div class="tab-header">
+                        <h4>Ordonnances</h4>
+                        <button class="btn btn-primary" onclick="patientsManager.showPrescriptionForm()">
+                            <i class="fas fa-plus"></i> Nouvelle Ordonnance
+                        </button>
+                    </div>
+                    <div id="prescriptions-list" class="loading">Chargement des ordonnances...</div>
+                </div>
+                
+                <div id="patient-dicom-tab" class="tab-content">
+                    <div class="tab-header">
+                        <h4>Images DICOM</h4>
+                        <button class="btn btn-primary" onclick="dicomViewer.showUploadForm()">
+                            <i class="fas fa-upload"></i> Importer DICOM
+                        </button>
+                    </div>
+                    <div id="dicom-viewer-container">
+                        <div id="dicom-list" class="loading">Chargement des images DICOM...</div>
+                        <div id="dicom-display" style="display: none;">
+                            <canvas id="dicom-canvas"></canvas>
+                            <div class="dicom-tools">
+                                <button onclick="dicomViewer.zoomIn()"><i class="fas fa-search-plus"></i></button>
+                                <button onclick="dicomViewer.zoomOut()"><i class="fas fa-search-minus"></i></button>
+                                <button onclick="dicomViewer.resetView()"><i class="fas fa-sync"></i></button>
+                                <button onclick="dicomViewer.measureDistance()"><i class="fas fa-ruler"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="patient-certificates-tab" class="tab-content">
+                    <div class="tab-header">
+                        <h4>Certificats Médicaux</h4>
+                        <button class="btn btn-primary" onclick="certificatesManager.showCertificateFormForPatient()">
+                            <i class="fas fa-plus"></i> Nouveau Certificat
+                        </button>
+                    </div>
+                    <div id="patient-certificates-list" class="loading">Chargement des certificats...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/patients.js"></script>
+    <script src="js/appointments.js"></script>
+    <script src="js/waiting-room.js"></script>
+    <script src="js/operations.js"></script>
+    <script src="js/certificates.js"></script>
+    <script src="js/finance.js"></script>
+    <script src="js/reports.js"></script>
+    <script src="js/dicom-viewer.js"></script>
+    
+    <script>
+        // Initialisation globale
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser tous les managers
+            if (typeof app !== 'undefined') app.init();
+            if (typeof appointmentsManager !== 'undefined') appointmentsManager.init();
+            if (typeof waitingRoomManager !== 'undefined') waitingRoomManager.init();
+            if (typeof operationsManager !== 'undefined') operationsManager.init();
+            if (typeof certificatesManager !== 'undefined') certificatesManager.init();
+            if (typeof financeManager !== 'undefined') financeManager.init();
+            if (typeof reportsManager !== 'undefined') reportsManager.init();
+            if (typeof dicomViewer !== 'undefined') dicomViewer.init();
+        });
+    </script>
+</body>
+</html>
