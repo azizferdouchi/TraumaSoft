@@ -1,18 +1,121 @@
-RewriteEngine On
+# Configuration Apache pour TraumaSoft
+# Version: 2.0.0
 
-# CORS headers
-Header always set Access-Control-Allow-Origin "*"
-Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+<IfModule mod_rewrite.c>
+    # Activer le moteur de réécriture
+    RewriteEngine On
+    
+    # Réécriture pour le backend
+    RewriteRule ^api/?$ backend/index.php [L,QSA]
+    RewriteRule ^api/(.*)$ backend/$1 [L,QSA]
+    
+    # Réécriture pour les contrôleurs
+    RewriteRule ^backend/controllers/(.*)$ backend/controllers/$1 [L,QSA]
+    
+    # Rediriger vers le frontend par défaut
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ frontend/index.html [L,QSA]
+</IfModule>
 
-# Handle preflight requests
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ $1 [R=200,L]
+# Configuration de base
+Options -Indexes
 
-# Rewrite rules for API - Backend
-RewriteRule ^backend/(.*)$ backend/index.php [QSA,L]
+# Type MIME pour les fichiers
+<IfModule mod_mime.c>
+    AddType application/json .json
+    AddType application/javascript .js
+    AddCharset UTF-8 .html .css .js .json .php
+</IfModule>
 
-# Frontend routing
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ frontend/index.html [L]
+# Compression GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json
+</IfModule>
+
+# Cache des fichiers statiques
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/html "access plus 1 day"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/json "access plus 1 day"
+</IfModule>
+
+# Headers de sécurité
+<IfModule mod_headers.c>
+    # Protection contre les attaques XSS
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Protection contre le clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Protection contre les attaques MIME
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Politique de sécurité du contenu (CSP)
+    Header always set Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://cdn.jsdelivr.net;"
+    
+    # HSTS (HTTP Strict Transport Security)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Permissions Policy
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Configuration PHP
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 60
+    php_value memory_limit 128M
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
+
+# Gestion des erreurs
+ErrorDocument 400 /400.html
+ErrorDocument 401 /401.html
+ErrorDocument 403 /403.html
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# Accès interdit aux fichiers sensibles
+<FilesMatch "\.(htaccess|ini|log|sql|md|json|lock|yml|yaml|env|sh|bat)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Accès interdit aux dossiers sensibles
+<DirectoryMatch "^.*(config|controllers|models|database|vendor|logs|tmp|cache)$">
+    Order Allow,Deny
+    Deny from all
+</DirectoryMatch>
+
+# Autoriser l'accès au backend
+<Directory "backend">
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# Autoriser l'accès au frontend
+<Directory "frontend">
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# Bloquer l'accès direct aux fichiers PHP dans le frontend
+<Directory "frontend">
+    <FilesMatch "\.php$">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+</Directory>
